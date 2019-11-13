@@ -83,6 +83,8 @@ Grid 布局的属性分成两类。一类定义在容器上面，称为容器属
 - align-self属性设置单元格内容的垂直位置（上中下） align-self: start | end | center | stretch;
 - place-self属性是align-self属性和justify-self属性的合并简写形式  place-self: <align-self> <justify-self>;
 
+[参考示例](http://dongqunren.gitee.io/notebook/interview/blog/grid.html)
+
 ## Flex布局
 
 采用 Flex 布局的元素，称为 Flex 容器（flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（flex item），简称"项目"。
@@ -112,6 +114,42 @@ Grid 布局的属性分成两类。一类定义在容器上面，称为容器属
 - flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto，后两个属性可选  flex: none | <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> 
 - align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
 	- align-self: auto | flex-start | flex-end | center | baseline | stretch;
+
+[参考示例](http://dongqunren.gitee.io/notebook/interview/blog/flex.html)
+
+##  Grid布局，还是Flex布局？
+
+如果你需要使用`calc()`进行布局，此时你可能需要用到Grid布局。
+
+Grid和flexbox之间的最大区别是，Grid使我们能够更好控制二维（行和列）中项目的摆放，而flexbox则不行。同样，这并不意味着您永远不应该将网格用于一维布局。
+
+当我们有9个以上但少于12个的项目时会发生什。我们是否希望新项目像我们已经看到的示例那样仅位于下一行的开头？还是我们希望他们的行为有所不同？也许如果下一行只有一项，我们希望它占用该行的所有可用空间，例如下面的示例A。或者，如果有两个项目，那么我们希望将它们居中，例如示例B。
+
+![to-grid-or-to-flex](./images/to-grid-or-to-flex.svg)
+
+使用网格布局和自动放置，我们只能将最后一个项目放置在左侧的单元格中，假设`direction`属性的值未设置为`rtl`（在这种情况下，项目的放置将从右向左流动，最后一项将放置在右侧的单元格中）。Flexbox允许项目弯曲。这意味着我们可以结合使用flex和alignment属性来控制这些项目的行为。
+
+因此，无论您是为上面的布局选择Grid还是flexbox，实际上都取决于您希望网格项目如何工作-以及针对不同情况的不同答案。
+
+如果使用的是Grid，则需要考虑的另一个问题是浏览器支持，我们是否希望在不支持Grid的浏览器（IE11及以下）中显示布局。常用功能查询来满足这些情况。
+
+```css
+.grid {
+	display: flex;
+	flex-wrap: wrap;
+	/* Rest of the fallback layout code */
+}
+
+@supports (display: grid) {
+	.grid {
+		display: grid;
+		/* Rest of the Grid code */
+	}
+}
+```
+
+但是，如果您发现自己花费了数小时试图为不支持Grid的浏览器复制完全相同的布局，那么首先就没有太多理由使用Grid。Grid的伟大之处在于它可以完成Flexbox本身无法做到的事情。
+
 
 参考文章：
 
