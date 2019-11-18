@@ -467,6 +467,120 @@ HTTP(S) 请求地址 → DNS 解析 → 三次握手 → 发送请求 → 四次
 
 ![四次挥手](./images/tcp2.png)
 
+### OSI七层参考模型
+
+OSI（Open System Interconnect），即开放式系统互联。 一般都叫OSI参考模型，是ISO组织在1985年研究的网络互联模型。该体系结构标准定义了网络互联的七层框架（物理层、数据链路层、网络层、传输层、会话层、表示层和应用层），即OSI开放系统互连参考模型。
+
+![OSI七层参考模型1](./images/osi.png)
+
+![OSI七层参考模型](./images/osi2.png)
+
+### HTTP 0.9~3.0 对比
+
+#### HTTP 0.9
+
+只允许客户端发送 GET 这一种请求；且不支持请求头，协议只支持纯文本；无状态性，每个访问独立处理，完成断开；无状态码。
+
+#### HTTP 1.0
+
+有身份认证，三次握手； 请求与响应支持头域。
+
+请求头内容：
+
+- Accept：客户端可接受的 MIME 类型
+- Accept-Encoding：客户端支持的数据压缩格式，数据可解码的格式
+- Accept-Language：客户端可接受语言
+- Connection：请求完成后，是否保持连接，值 keep-alive 是长连接
+- Host：主机和端口
+- Pragma：是否缓存,指定 no-cache 返回刷新
+- Referer：客户端是从哪个资源来访问服务器的（防盗链），页面路由
+- If-Modified-Since：资源的缓存时间
+
+响应头内容：
+
+- Connection：值 keep-alive 是长连接
+- Content-Type：返回文档类型，常见的值有 text/plain、text/html、text/json
+- Date：消息发送的时间
+- Server：服务器名字
+- Last-Modified：值为时间s，返回的最后修改时间
+- Expires：缓存过期时间，b 和 s 时间做对比
+
+expires 是响应头内容，返回一个固定的时间，缺陷是时间到了服务器要重新设置；请求头中如果有 If-Modified-Since，服务器会将时间与 last-modified 对比，相同返回 304；支持 GET、HEAD、POST 方法；有状态码；支持长连接（但默认还是使用短连接）、缓存机制以及身份认证。
+
+#### HTTP 1.1
+
+请求头增加 Cache-Control：
+
+- Cache-Control：指定请求和响应遵循的缓存机制,值有：public(b 和 s 都缓存)，private(b 缓存)，no-cache(不缓存)，no-store(不缓存)，max-age(缓存时间,s 为单位)，min-fresh(最小更新时间)，max-age=3600
+- If-None-Match：上次请求响应头返回的 etag 值响应头增加 Cache-Control，表示所有的缓存机制是否可以缓存及哪种类型 etag 返回的哈希值，第二次请求头携带去和服务器值对比
+
+Cache-Control 的 max-age 返回是缓存的相对时间，Cache-Control 优先级比 expires 高，缺点：不能第一时间拿到最新修改文件
+
+#### HTTP 2.0
+
+采用二进制格式传输；多路复用，将请求数据分成帧乱序发送到 TCP 中，TCP 只能有一个 steam，所以还是会阻塞；报头压缩；服务器推送主动向 B 端发送静态资源，避免往返延迟。
+
+#### HTTP 3.0
+
+基于 QUIC 协议，基于 UDP。
+
+特点：
+
+- 自定义连接机制：TCP 以 IP/端口标识，变化重新连接握手，UDP 是以 64 位 ID 标识，是无连接；
+- 自定义重传机制：TCP 使用序号和应答传输，QUIC 是使用递增序号传输； 
+- 无阻塞的多路复用：同一条 QUIC 可以创建多个 steam。
+
+#### HTTPS
+
+https（全称：Hyper Text Transfer Protocol over Secure Socket Layer） 是在 http 协议的基础上加了个 SSL；主要包括：握手(凭证交换和验证)和记录协议(数据进行加密)。
+
+HTTP 与 HTTPS 的区别：
+
+- HTTP 是明文传输，HTTPS 通过 SSL\TLS 进行了加密
+- HTTP 的端口号是 80，HTTPS 是 443
+- HTTPS 需要到 CA 申请证书，一般免费证书很少，需要交费
+- HTTP 的连接很简单，是无状态的；TLS / SSL是有状态的；HTTPS 协议是由 SSL+HTTP 协议构建的，可进行加密传输、身份认证的网络协议，比 HTTP 协议安全
+
+#### 缓存
+
+分类：
+
+- 按协议分：协议层缓存和非 http 协议缓存
+	- 协议层缓存：利用 http 协议头属性值设置
+	- 非协议层缓存：利用 meta 标签的 http-equiv 属性值 Expires，set-cookie
+- 按缓存分：强缓存和协商缓存
+	- 强缓存：利用 cache-control 和 expires 设置，直接返回一个过期时间，所以在缓存期间不请求，If-modify-since
+	- 协商缓存：响应头返回 etag 或 last-modified 的哈希值，第二次请求头 If-none-match 或 IF-modify-since 携带上次哈希值，一致则返回 304
+
+etag 优先级高于 last-modified；etag 精度高，last-modified 精度是 s，1s 内 etag 修改多少次都会被记录； last-modified 性能好，etag 要得到 hash 值。
+
+浏览器读取缓存流程：会先判断强缓存；再判断协商缓存 etag(last-modified)是否存在；存在利用属性 If-None-match(If-Modified-since)携带值；请求服务器,服务器对比 etag(last-modified)，生效返回 304。
+
+F5 刷新会忽略强缓存不会忽略协商缓存，ctrl+f5 都失效
+
+#### 状态码
+
+当浏览者访问一个网页时，浏览者的浏览器会向网页所在服务器发出请求。当浏览器接收并显示网页前，此网页所在的服务器会返回一个包含HTTP状态码的信息头（server header）用以响应浏览器的请求。HTTP状态码的英文为HTTP Status Code。
+
+HTTP状态码分类：
+
+- `1xx`：表示临时响应并需要请求者继续执行操作的状态码
+	- 100：	继续。客户端应继续其请求
+	- 101：切换协议。服务器根据客户端的请求切换协议。只能切换到更高级的协议，例如，切换到HTTP的新版本协议
+- `2xx`：成功，操作被成功接收并处理
+	- 200：	请求成功。一般用于GET与POST请求
+	- 201已创建、202已接受、203非授权信息、204无内容、205重置内容、206部分内容
+- `3xx`：重定向，需要进一步的操作以完成请求
+	- 300多种选择、301永久移动、302临时移动、303查看其它地址
+	- 304：未修改。所请求的资源未修改，服务器返回此状态码时，不会返回任何资源
+	- 305使用代理、307临时重定向
+- `4xx`：客户端错误，请求包含语法错误或无法完成请求
+	- 400错误请求，客户端请求的语法错误、401未授权，请求要求用户的身份认证、403禁止，服务器理解请求客户端的请求，但是拒绝执行此请求
+	- 404未找到，服务器找不到请求的网页
+	- 405方法禁用，禁用请求中指定的方法、406不接受、407需要代理授权、408请求超时、409冲突、410已删除、411需要有效长度、412未满足前提条件、413请求实体过大
+	- 414请求的URI过长、415不支持媒体类型、416请求范围不符合要求、417未满足期望值
+- `5xx`：服务器错误，服务器在处理请求的过程中发生了错误
+
 参考文章：
 
 - [一个前端眼中的斐波那契数列](https://juejin.im/entry/5ab452b56fb9a028d3755376)
@@ -478,3 +592,6 @@ HTTP(S) 请求地址 → DNS 解析 → 三次握手 → 发送请求 → 四次
 - [【前端进阶之路】没有入门设计模式？那看这篇就够了！](https://juejin.im/post/5d1af3fce51d45773f2e8f9d#heading-11)
 - [HTTP和HTTPS详解](https://juejin.im/post/5af557a3f265da0b9265a498)
 - [JS 原生面经从初级到高级【近1.5W字】](https://juejin.im/post/5daeefc8e51d4524f007fb15?utm_source=gold_browser_extension#heading-130)
+- [OSI七层参考模型详解](https://blog.csdn.net/weixin_41944347/article/details/88709570)
+- [HTTP协议详细介绍](https://www.cnblogs.com/haiyan123/p/7777924.html)
+- [谈谈 HTTPS](https://juejin.im/post/59e4c02151882578d02f4aca)
