@@ -239,6 +239,19 @@ function handle() {
   console.log(Math.random());
 }
 window.addEventListener("scroll", throttle(handle, 1000));
+
+throttle(fun, delay, immediate) {
+  let flag = false;
+  return (...args) => {
+    if (!flag) {
+      flag = true;
+      setTimeout(() => {
+        fun.apply(this, args);
+        flag = false;
+      }, delay);
+    }
+  };
+}
 ```
 
 2.防抖：事件触发动作完成后一段时间触发一次；scroll,resize事件触发完后一段时间触发
@@ -258,6 +271,112 @@ function handle() {
   console.log(Math.random());
 }
 window.addEventListener("scroll", debounce(handle, 1000));
+
+debounce(fun, delay, immediate) {
+  let timer = null;
+  return (...args) => {
+    if (timer) {
+      clearTimeout(timer);
+    } else {
+      timer = setTimeout(() => {
+        fun.apply(this, args);
+      }, delay);
+    }
+  };
+}
+```
+
+### 其他工具类函数
+
+1.缓存函数，可以缓存函数的执行结果，在第二次调用之后会加速：
+
+```javascript
+memeorize(fun) {
+  let cache = {};
+  return (...args) => {
+    const key = args.toString();
+    if (cache[key]) {
+      return cache[key];
+    }
+    let value = fun.apply(this, args);
+    cache[key] = value;
+    return value;
+  };
+}
+```
+
+2.实现 promisy 函数，将一个callback的函数转化为promise 链式调用：
+
+```javascript
+promisy(fun) {
+  return (...args) => {
+    return new Promise((resolve, reject) => {
+      try {
+        fun(...args, resolve);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+}
+fun(arg1,callback);
+let promisey = promisy(fun);
+promisey().then((res)=>());
+```
+
+3.柯里化
+
+```javascript
+currying(fun) {
+  function helper(fn, ...arg1) {
+    let length = fn.length;
+    let self = this;
+    return function(...arg2) {
+      let arg = arg1.concat(arg2);
+      if (arg.length < length) {
+        return helper.call(self, fn, ...arg);
+      }
+      return fn.apply(this, arg);
+    };
+  }
+  return helper(fun);
+}
+function add(a, b) {
+  return a + b;
+}
+let curryadd = currying(add);
+let add1 = curryadd(1);
+add1(2, 3)
+```
+
+4.格式化，以千分位格式化数字，输入123456，输出123,456
+
+```javascript
+formatNumber(number) {
+  if (typeof number !== "number") {
+    return null;
+  }
+  if (isNaN(number)) {
+    return null;
+  }
+  let result = [];
+  let tmp = number + "";
+  let num = number;
+  let suffix = "";
+  if (tmp.indexOf(".") !== -1) {
+    suffix = tmp.substring(tmp.indexOf(".") + 1);
+    num = parseInt(tmp.substring(0, tmp.indexOf(".")));
+  }
+  while (num > 0) {
+    result.unshift(num % 1000);
+    num = Math.floor(num / 1000);
+  }
+  let ret = result.join(",");
+  if (suffix !== "") {
+    ret += "." + suffix;
+  } 
+  return ret;
+}
 ```
 
 ### 原型链
@@ -310,6 +429,106 @@ var new2 = function (func) {
     return o;//不是返回返回构造函数的执行结果
   }
 } 
+
+function myNew(fun, ...arg) {
+  if (typeof fun !== "function") {
+    throw new TypeError(" fun is not a function");
+  }
+  let obj = {};
+  // Object.setPrototypeOf(obj, prototype)设置一个指定的对象的原型 ( 即, 内部[[Prototype]]属性）到另一个对象或  null
+  Object.setPrototypeOf(obj, fun.prototype);
+  fun.apply(obj, arg);
+  return obj;
+}
+```
+
+4.实现instanceof:
+
+```javascript
+function isInstanceOf(child, fun) {
+  if (typeof fun !== "function") {
+    throw new TypeError("arg2 fun is not a function");
+  }
+  if (child === null) {
+    return false;
+  }
+  if (child.__proto__ !== fun.prototype) {
+    return isInstanceOf(child.__proto__, fun);
+  }
+  return true;
+}
+```
+
+5.实现JSON.parse函数:
+
+```javascript
+function JSONParse(strs) {
+  if (strs === "" || typeof strs !== "string") {
+    throw new SyntaxError("JSONParse error");
+  }
+  if (strs[0] === "{") {
+    let obj = {};
+    if (strs[strs.length - 1] == "}") {
+      let fields = strs.substring(1, strs.length - 1).split(",");
+      for (let field of fields) {
+        let index = field.indexOf(":");
+        let temp = [];
+        if (index !== -1) {
+          temp[0] = field.substring(0, index);
+          temp[1] = field.substring(index + 1, field.length);
+        }
+        let key = temp[0].substring(1, temp[0].length - 1);
+        let value = JSONParse(temp[1]);
+        obj[key] = value;
+      }
+    }
+    console.log("prase:", obj);
+    return obj;
+  }
+  if (strs[0] === "[") {
+    if (strs[strs.length - 1] == "]") {
+      let result = [];
+      let fields = strs.substring(1, strs.length - 1).split(",");
+      for (let field of fields) {
+        result.push(JSONParse(fields));
+      }
+      return result;
+    }
+  }
+  return strs;
+}
+```
+
+6.实现JSON.stringify函数:
+
+```javascript
+function JSONStringify(obj) {
+  if (
+    obj === undefined ||
+    obj === null ||
+    typeof obj === "string" ||
+    typeof obj === "boolean" ||
+    typeof obj === "number"
+  ) {
+    return obj;
+  }
+  if (typeof obj === "function") {
+    return "";
+  }
+  if (Array.isArray(obj)) {
+    let result = [];
+    for (let i = 0; i < obj.length; i++) {
+      result.push(JSONStringify(obj[i]));
+    }
+    return "[" + result.join(",") + "]";
+  } else {
+    let result = [];
+    for (let key in obj) {
+      result.push(`"${key}":${JSONStringify(obj[key])}`);
+    }
+    return "{" + result.join(",") + "}";
+  }
+}
 ```
 
 ### 继承
