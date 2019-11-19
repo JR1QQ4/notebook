@@ -508,6 +508,48 @@ selectionSort([5, 4, 3, 2, 1]) // [1, 2, 3, 4, 5]
 // array:  (5) [1, 2, 3, 4, 5]
 ```
 
+4.快速排序:
+
+```javascript
+function quickSort(arr) {
+  if (arr.length<=1) {return arr;}
+    var left = [],
+    right = [],
+    baseDot =Math.round(arr.length/2),
+    base =arr.splice(baseDot, 1)[0];
+
+  for (var i =0; i <arr.length; i++) {
+    if (arr[i] < base) {
+      left.push(arr[i])
+    }else {
+      right.push(arr[i])
+    }
+  }
+  return quickSort(left).concat([base], quickSort(right));
+}
+
+function quickSort(array, left, right) {
+  var length =array.length,
+    left =typeof left ==='number'? left :0,
+    right =typeof right ==='number'? right : length-1;
+
+  if (left < right) {
+    var index = left -1;
+    for (var i = left; i <= right; i++) {
+      if (array[i] <= array[right]) {
+        index++;
+        var temp = array[index];
+        array[index] = array[i];
+        array[i] = temp;
+      }
+    }
+    quickSort(array, left, index -1);
+    quickSort(array, index +1, right);
+  }
+  return array;
+}
+```
+
 ### 斐波那契
 
 第三项等于前面两项之和：
@@ -616,6 +658,78 @@ console.log(minCoinChange.makeChange(34)); // [25, 5, 1, 1, 1, 1]
 console.log(minCoinChange.makeChange(6)); // [5, 1]
 ```
 
+### 二分查找
+
+给定一个排序好的数组，用二分查找的办法找出目标元素
+
+```javascript
+const binarySearch = function(ary, target) {
+  if (!Array.isArray(ary)) {
+    throw new TypeError("arg1 is not a array");
+  }
+  let start = 0,
+  end = ary.length - 1;
+  while (start <= end) {
+    let mid = Math.floor(start + (end - start) / 2);
+    if (ary[mid] === target) {
+      return mid;
+    } else if (ary[mid] < target) {
+      start = mid + 1;
+    } else {
+      end = mid - 1;
+    }
+  }
+  return -1;
+};
+```
+
+### 其他
+
+数组洗牌（数组乱序）：将数组中的数字，打乱顺序，保证每个位置的概率相等
+
+```javascript
+const flush = function(num = []) {
+  for (let i = 0; i < num.length; i++) {
+    let index = Math.floor(Math.random() * (num.length - 1));
+    let temp = num[i];
+    num[i] = num[index];
+    num[index] = temp;
+  }
+  return num
+};
+
+function shuffle(arr){
+  let m = arr.length;
+  while(m > 1){
+    let index = parseInt(Math.random() * m--);
+    [arr[index],arr[m]] = [arr[m],arr[index]];
+  }
+  return arr;
+}
+```
+
+集合的子集：输入集合`[A,B]`，输出`[],[A],[B],[A,B]`
+
+```javascript
+var subsets = function(nums) {
+  let result = [];
+  function dfs(index,ans){
+    let ans2 = ans.concat();
+    ans2.push(nums[index]);
+    if(index === 0){
+      result.push(ans);
+      result.push(ans2);
+      return;
+    }else{
+      dfs(index-1,ans);
+      dfs(index-1,ans2);
+    }
+  }
+  dfs(nums.length-1,[]);
+  return result;
+};
+```
+
 参考文章：
 
 - [一个前端眼中的斐波那契数列](https://juejin.im/entry/5ab452b56fb9a028d3755376)
@@ -623,3 +737,5 @@ console.log(minCoinChange.makeChange(6)); // [5, 1]
 - [JavaScript 数据结构与算法之美 - 冒泡排序、插入排序、选择排序](https://juejin.im/post/5d341a89f265da1bac405369)
 - [MDN JavaScript教程](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript)
 - [JS 原生面经从初级到高级【近1.5W字】](https://juejin.im/post/5daeefc8e51d4524f007fb15?utm_source=gold_browser_extension#heading-130)
+- [JS快速排序&三路快排](https://juejin.im/post/5c662e496fb9a049b82afb71)
+- [“寒冬”三年经验前端面试总结（含头条、百度、饿了么、滴滴等）之手写题（一）](https://juejin.im/post/5d9eef20e51d45781332e961#heading-0)
