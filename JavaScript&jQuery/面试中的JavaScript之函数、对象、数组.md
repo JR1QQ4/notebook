@@ -327,7 +327,7 @@ promisey().then((res)=>());
 3.柯里化
 
 ```javascript
-currying(fun) {
+function currying(fun) {
   function helper(fn, ...arg1) {
     let length = fn.length;
     let self = this;
@@ -347,6 +347,16 @@ function add(a, b) {
 let curryadd = currying(add);
 let add1 = curryadd(1);
 add1(2, 3)
+
+const curry = (fn) => {
+  if (fn.length <= 1) return fn;
+  // const generator = (args) => (args.length === fn.length ? fn(...args) : arg => generator([...args, arg]));
+  const generator = (args, rest) => (!rest ? fn(...args) : arg => generator([...args, arg], rest - 1));
+  return generator([], fn.length);
+};
+const sum = (a, b, c) => a + b + c;
+const curriedSum = curry(sum); 
+curriedSum(1)(2)(3);
 ```
 
 4.格式化，以千分位格式化数字，输入123456，输出123,456
@@ -365,7 +375,7 @@ formatNumber(number) {
   let suffix = "";
   if (tmp.indexOf(".") !== -1) {
     suffix = tmp.substring(tmp.indexOf(".") + 1);
-    num = parseInt(tmp.substring(0, tmp.indexOf(".")));
+    num = parseInt(tmp.substring(0, tmp.indexOf("."))); 	
   }
   while (num > 0) {
     result.unshift(num % 1000);
@@ -376,6 +386,41 @@ formatNumber(number) {
     ret += "." + suffix;
   } 
   return ret;
+}
+```
+
+4.实现一个sleep的函数：
+
+```javascript
+function sleep(delay){
+  return new Promise((resolve,reject)=>{
+    setTimeout(()=>{
+      resolve()
+    },delay);
+  })
+}
+```
+
+5.使用XMLHttpRequest 实现一个Promise的aja:
+
+```javascript
+function myRequest(url, method, params) {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState != 4) {
+        return null;
+      }
+      if (xhr.state === 200) {
+        resolve(xhr.response);
+      }
+    };
+    xhr.addEventListener("error", e => {
+      reject(error);
+    });
+    xhr.send(params);
+  });
 }
 ```
 
@@ -910,6 +955,9 @@ console.log(returnedTarget);  // expected output: Object { a: 1, b: 4, c: 5 }
 2.JSON.stringify 深拷贝
 
 ```javascript
+function deepClone(arr){
+  return JSON.parse(JSON.stringify(arr))
+}
 let obj1 = { a: 0 , b: { c: 0}}; 
 let obj3 = JSON.parse(JSON.stringify(obj1)); 
 obj1.a = 4; 
@@ -925,7 +973,7 @@ function deepClone(source){
   for(let keys in source){ // 遍历目标
     if(source.hasOwnProperty(keys)){
       if(source[keys] && typeof source[keys] === 'object'){ // 如果值是对象，就递归一下
-        targetObj[keys] = source[keys].constructor === Array ? [] : {};
+        // targetObj[keys] = source[keys].constructor === Array ? [] : {};
         targetObj[keys] = deepClone(source[keys]);
       }else{ // 如果不是，就直接赋值
         targetObj[keys] = source[keys];
@@ -1181,6 +1229,18 @@ function flatten(arr) {
 }
 flatten([1,[2,3]]) // [1, 2, 3]
 flatten([1,[2,3,[4,5]]]) // [1, 2, 3, 4, 5]
+
+function flattenByDeep(array,deep){
+  var result = [];
+  for(var i = 0 ; i < array.length; i++){
+    if(Array.isArray(array[i]) && deep >= 1){
+      result = result.concat(flattenByDeep(array[i],deep -1))
+    }else{
+      result.push(array[i])
+    }
+  }
+  return result;
+}
 ```
 
 ### 去重
@@ -1208,6 +1268,19 @@ Array.prototype.distinct = function() {
   return result
 }
 [1,2,3,3,4,4].distinct(); // [1,2,3,4]
+
+function removeDup(arr){
+  var result = [];
+  var hashMap = {};
+  for(var i = 0; i < arr.length; i++){
+    var temp = arr[i]
+    if(!hashMap[temp]){
+      hashMap[temp] = true
+      result.push(temp)
+    }
+  }
+  return result;
+}
 ```
 
 ### 排序
@@ -1392,6 +1465,21 @@ var a = [1,2,3]
 ```javascript
 var a = [1,2,3]
 a.filter(item => item>2) // [3]，a不改变
+
+Array.prototype.filter = function(fn,context){
+  if(typeof fn != 'function'){
+    throw new TypeError(`${fn} is not a function`)
+  }
+  let arr = this;
+  let reuslt = []
+  for(var i = 0;i < arr.length; i++){
+    let temp= fn.call(context,arr[i],i,arr);
+    if(temp){
+      result.push(arr[i]);
+    }
+  }
+  return result
+}
 ```
 
 ### 对象和数组
@@ -1405,7 +1493,147 @@ Object.entries({name:'张三',age:14}) // [["name", '张三'], ["age", 14]]
 Object.fromEntries([name,'张三'],[age,14]) // ES10的api，Chrome不支持， firebox输出{name:'张三',age:14}
 ```
 
+## 常见问题
+
+1.typeof 和 instanceof：
+
+- 都是用来判断数据类型的
+- typeof 返回一个字符串，instanceof 判断是否是指定对象的实例
+
+2.ES6的新特性：
+
+- let 和 const 没有变量的提升，不能重名，有块级作用域变量；const 声明的变量必须初始化
+- 可以给形参函数设置默认值
+- 数组的扩展运算符`console.log(...[1, 2])`
+- 数组的解构`const [first, ...rest] = [1, 2, 3, 4, 5];`，对象的解构`const full = ({ first, last }) => first + ' ' + last;`
+- 箭头函数、类、模块、Promise、Proxy、Set、Map、Symbol
+
+3.闭包：
+
+闭包只是一种现象，产生条件 -- 当一个函数(outer)运行时它的形参或者它的局部变量被其他函数所引用，这个outer就会形成闭包。即在函数里面声明函数，子函数可以访问父函数中的局部变量，从而保护变量不受外界污染。
+
+4.浏览器渲染：五个步骤并不一定一次性顺序完成
+
+- 处理 HTML 标记并构建 DOM 树
+- 处理 CSS 标记并构建 CSSOM 树
+- 将 DOM 与 CSSOM 合并成一个渲染树
+- 根据渲染树来布局，以计算每个节点的几何信息
+- 将各个节点绘制到屏幕上
+
+5.从输入URL到看到页面发生了什么：
+
+DNS解析；发起TCP连接；发送HTTP请求；服务器处理请求并返回HTTP报文；浏览器解析渲染页面；连接结束。
+
+6.session、cookie、localStorage
+
+- 相同点：都是保存在浏览器端，且同源的。
+- 不同点：
+	- cookie在浏览器和服务器间来回传递；essionStorage和localStorage不会自动把数据发给服务器，仅在本地保存
+	- cookie有路径（path）的概念，可以限制cookie只属于某个路径下；
+	- cookie数据不能超过4k；sessionStorage和localStorage可以达到5M或更大
+	- sessionStorage仅在当前浏览器窗口关闭前有效；localStorage始终有效，窗口或浏览器关闭也一直保存；cookie只在设置的cookie过期时间之前一直有效
+
+7.跨域：
+
+- 同源策略（协议+端口号+域名要相同）
+- jsonp跨域（只能解决get），动态创建一个script标签
+- document.domain 基础域名相同 子域名不同
+- window.name 利用在一个浏览器窗口内，载入所有的域名都是共享一个
+- 服务器设置对CORS的支持 原理：服务器设置Access-Control-Allow-Origin HTTP响应头之后，浏览器将会允许跨域请求
+- 利用h5新特性window.postMessage()
+
+8.页面优化：
+
+- 减少 HTTP请求数
+- 从设计实现层面简化页面
+- 合理设置 HTTP缓存
+- 资源合并与压缩
+- 合并 CSS图片，减少请求数的又一个好办法
+- 将外部脚本置底（将脚本内容在页面信息内容加载后再加载）
+- 多图片网页使用图片懒加载
+- 在js中尽量减少闭包的使用
+- 尽量合并css和js文件
+- 尽量使用字体图标或者SVG图标，来代替传统的PNG等格式的图片
+- 减少对DOM的操作
+- 在JS中避免“嵌套循环”和 “死循环”
+- 尽可能使用事件委托（事件代理）来处理事件绑定的操作
+
+9.移动端的兼容问题：
+
+- 给移动端添加点击事件会有300S的延迟，如果用点击事件，需要引一个fastclick.js文件，解决300s的延迟 一般在移动端用ontouchstart、ontouchmove、ontouchend
+- 移动端点透问题，touchstart 早于 touchend 早于click，click的触发是有延迟的，这个时间大概在300ms左右；消除 IE10 里面的那个叉号`input:-ms-clear{display:none;}`
+- 设置缓存，手机页面通常在第一次加载后会进行缓存，然后每次刷新会使用缓存而不是去重新向服务器发送请求。如果不希望使用缓存可以设置no-cache
+- 圆角BUG，某些Android手机圆角失效`background-clip: padding-box;`
+
+10.虚拟DOM和DOM-diff：
+
+虚拟DOM，用JS去按照DOM结构来实现的树形结构对象，即DOM对象。DOM-diff给定任意两棵树，采用先序深度优先遍历的算法比较两个虚拟DOM的区别；根据两个虚拟对象创建出补丁，描述改变的内容，将这个补丁用来更新DOM。
+
+DOM-diff的过程：
+
+- 用JS对象模拟DOM（虚拟DOM）
+- 把此虚拟DOM转成真实DOM并插入页面中（render）
+- 如果有事件发生修改了虚拟DOM，比较两棵虚拟DOM树的差异，得到差异对象（diff）
+- 把差异对象应用到真正的DOM树上（patch）
+
+11.this指向
+
+- 全局作用域下的this指向window
+- 如果给元素的事件行为绑定函数，那么函数中的this指向当前被绑定的那个元素
+- 函数中的this，要看函数执行前有没有`.`, 有`.`的话，点前面是谁，this就指向谁，如果没有点，指向window
+- 自执行函数中的this永远指向window
+- 定时器中函数的this指向window
+- 构造函数中的this指向当前的实例
+- 箭头函数中没有this，如果输出this，就会输出箭头函数定义时所在的作用域中的this
+
+12.冒泡和默认行为
+
+```javascript
+// 阻止冒泡
+function stopBubble(e) {
+  if (e && e.stopPropagation) { 
+    e.stopPropagation()
+  } else {
+    window.event.cancelBubble = true
+  }
+}
+
+// 阻止默认行为
+function stopDefault(e) {
+  if (e && e.preventDefault) {
+    e.preventDefault()
+  } else {
+    window.event.returnValue = false
+  }
+}
+```
+
+13.Array对象方法：
+
+|  方法   |  描述   |
+| --- | --- |
+|  entries()   |  	返回数组的可迭代对象   |
+|  filter(function(currentValue,index,arr), thisValue)   |  检测数值元素，并返回符合条件所有元素的数组   |
+|  find(function(currentValue, index, arr),thisValue)   |  返回符合传入测试（函数）条件的数组元素   |
+|  findIndex(function(currentValue, index, arr), thisValue)   |  返回符合传入测试（函数）条件的数组元素索引   |
+|  forEach(function(currentValue, index, arr), thisValue)   |  数组每个元素都执行一次回调函数   |
+|  from(object, mapFunction, thisValue)   |  通过给定的对象中创建一个数组   |
+|  includes(searchElement, fromIndex)   |  判断一个数组是否包含一个指定的值   |
+|  keys()   |  返回数组的可迭代对象，包含原始数组的键(key)   |
+|  map(function(currentValue,index,arr), thisValue)   |  通过指定函数处理数组的每个元素，并返回处理后的数组   |
+|  reduce(function(total, currentValue, currentIndex, arr), initialValue)   |  将数组元素计算为一个值（从左到右）   |
+|  slice(start, end)   |  选取数组的的一部分，并返回一个新数组   |
+|  sort(sortfunction)   |   对数组的元素进行排序  |
+|  splice(index,howmany,item1,.....,itemX)   |   从数组中添加或删除元素  |
+
+
 参考文章：
 
 - [MDN JavaScript教程](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript)
 - [JS 原生面经从初级到高级【近1.5W字】](https://juejin.im/post/5daeefc8e51d4524f007fb15?utm_source=gold_browser_extension#heading-130)
+- [三行代码实现 JS 柯里化](https://juejin.im/post/5bf9bb7ff265da616916e816)
+- [2019-大龄前端如何准备面试之手写题](https://juejin.im/post/5d84e82951882514eb4576f7#heading-2)
+- [9分钟，搞明白闭包](https://juejin.im/post/5d7864e46fb9a06b051818e8)
+- [浏览器的渲染：过程与原理](https://juejin.im/entry/59e1d31f51882578c3411c77)
+- [史上最详细的经典面试题 从输入URL到看到页面发生了什么？](https://juejin.im/post/5cc573c85188252e741ccbb6#heading-67)
+- [让虚拟DOM和DOM-diff不再成为你的绊脚石](https://juejin.im/post/5c8e5e4951882545c109ae9c)
