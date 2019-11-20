@@ -712,6 +712,26 @@ socket.addEventListener('message', function (event) {
 });
 ```
 
+### CloseEvent
+
+CloseEvent 会在连接关闭时发送给使用 WebSockets 的客户端. 它在 WebSocket 对象的 onclose 事件监听器中使用.
+
+```javascript
+var event = new CloseEvent(typeArg, closeEventInit);
+```
+
+### MessageEvent
+
+MessageEvent  是接口代表一段被目标对象接收的消息。
+
+```javascript
+var messageEvent = new MessageEvent(type, init);
+
+var myMessage = new MessageEvent('worker', {
+  data : 'hello'
+});
+```
+
 参考文章：
 
 - [一个前端眼中的斐波那契数列](https://juejin.im/entry/5ab452b56fb9a028d3755376)
