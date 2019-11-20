@@ -356,7 +356,21 @@ const curry = (fn) => {
 };
 const sum = (a, b, c) => a + b + c;
 const curriedSum = curry(sum); 
-curriedSum(1)(2)(3);
+curriedSum(1)(2)(3); 
+
+function currying(fn,...args){
+  if(fn.length <= args.length){
+    return fn(...args)
+  }
+  return function(...args1){
+    return currying(fn,...args,...args1)
+  }
+}
+function add(a,b,c){
+  return a + b + c
+}
+var curryingAdd = currying(add);
+curryingAdd(1)(2)(3) // 6
 ```
 
 4.格式化，以千分位格式化数字，输入123456，输出123,456
@@ -424,6 +438,94 @@ function myRequest(url, method, params) {
 }
 ```
 
+6.实现eventEmitter：
+
+```javascript
+class EventEmitter {
+  constructor(){
+    this.events = {}
+  }
+  on(name,cb){
+    if(!this.events[name]){
+      this.events[name] = [cb];
+    }else{
+      this.events[name].push(cb)
+    }
+  }
+  emit(name,...arg){
+    if(this.events[name]){
+      this.events[name].forEach(fn => {
+        fn.call(this,...arg)
+      })
+    }
+  }
+  off(name,cb){
+    if(this.events[name]){
+      this.events[name] = this.events[name].filter(fn => {
+        return fn != cb
+      })
+    }
+  }
+  once(name,fn){
+    var onlyOnce = () => {
+      fn.apply(this,arguments);
+      this.off(name,onlyOnce)
+    }
+    this.on(name,onlyOnce);
+    return this;
+  }
+}
+```
+
+7.实现Promise.all:
+
+```javascript
+Promise.all = function(arr){
+  return new Promise((resolve,reject) => {
+    if(!Array.isArray(arr)){
+      throw new TypeError(`argument must be a array`)
+    }
+    var length = arr.length;
+    var resolveNum = 0;
+    var resolveResult = [];
+    for(let i = 0; i < length; i++){
+      arr[i].then(data => {
+        resolveNum++;
+        resolveResult.push(data)
+        if(resolveNum == length){
+          return resolve(resolveResult)
+        }
+      }).catch(data => {
+        return reject(data)
+      })
+    }
+  })
+}
+```
+
+8.promise.retry:
+
+```javascript
+Promise.retry = function(fn, times, delay) {
+  return new Promise(function(resolve, reject){
+    var error;
+    var attempt = function() {
+      if (times == 0) {
+        reject(error);
+      } else {
+        fn().then(resolve)
+         .catch(function(e){
+           times--;
+           error = e;
+           setTimeout(function(){attempt()}, delay);
+        });
+      }
+    };
+    attempt();
+  });
+};
+```
+
 ### 原型链
 
 ![原型链](./images/prototype.png)
@@ -474,6 +576,12 @@ var new2 = function (func) {
     return o;//不是返回返回构造函数的执行结果
   }
 } 
+function newParent(Parent){
+  var obj = {}; // 首先创建一个对象
+  obj.__proto__ = Parent.prototype; // 然后将该对象的__proto__属性指向构造函数的protoType
+  var result = Parent.call(obj) // 执行构造函数的方法，将obj作为this传入
+  return typeof(result) == 'object' ?  result : obj
+}
 
 function myNew(fun, ...arg) {
   if (typeof fun !== "function") {
@@ -501,6 +609,20 @@ function isInstanceOf(child, fun) {
     return isInstanceOf(child.__proto__, fun);
   }
   return true;
+}
+
+function myInstanceof(left,right){
+  var proto = left.__proto__;
+  var protoType = right.prototype;
+  while(true){
+    if(proto === null){
+      return false
+    }
+    if(proto == protoType){
+      return true
+    }
+    proto = proto.__proto__
+  }
 }
 ```
 
@@ -574,6 +696,94 @@ function JSONStringify(obj) {
     return "{" + result.join(",") + "}";
   }
 }
+```
+
+7.lazyMan:
+
+```javascript
+function _LazyMan(name){
+  this.nama = name;
+  this.queue = [];
+  this.queue.push(() => {
+    console.log("Hi! This is " + name + "!");
+    this.next();
+  })
+  setTimeout(()=>{
+    this.next()
+  },0)
+}
+_LazyMan.prototype.eat = function(name){
+  this.queue.push(() =>{
+    console.log("Eat " + name + "~");
+    this.next()
+  })
+  return this;
+}
+_LazyMan.prototype.next = function(){
+  var fn = this.queue.shift();
+  fn && fn();
+}
+_LazyMan.prototype.sleep = function(time){
+  this.queue.push(() =>{
+    setTimeout(() => {
+      console.log("Wake up after " + time + "s!");
+      this.next()
+    },time * 1000)
+  })
+  return this;
+}
+_LazyMan.prototype.sleepFirst = function(time){
+  this.queue.unshift(() =>{
+    setTimeout(() => {
+      console.log("Wake up after " + time + "s!");
+      this.next()
+    },time * 1000)
+  })
+  return this;
+}
+function LazyMan(name){
+  return new _LazyMan(name)
+}
+LazyMan("Hank").sleep(10).eat("dinner");
+LazyMan("Hank").sleepFirst(5).eat("supper")
+```
+
+8.实现jsonp
+
+```javascript
+function handleResponse(response){
+  alert("You’re at IP address " + response.ip + ", which is in " +response.city + ", " + response.region_name);    
+}
+var script = document.createElement("script");
+script.src = "http://freegeoip.net/json/?callback=handleResponse";
+document.body.insertBefore(script,document.body.firstChild);    
+
+function jsonp(obj) {
+  const {url,data} = obj;
+  if (!url) return
+  return new Promise((resolve, reject) => {
+    const cbFn = `jsonp_${Date.now()}` 
+    data.callback = cbFn
+    const head = document.querySelector('head')
+    const script = document.createElement('script')
+    const src = `${url}?${data2Url(data)}`
+    console.log('scr',src)
+    script.src = src
+    head.appendChild(script)
+    window[cbFn] = function(res) {
+      res ? resolve(res) : reject('error')
+      head.removeChild(script)
+      window[cbFn] = null 
+    }
+  })
+}
+function data2Url(data) {
+  return Object.keys(data).reduce((acc, cur) => {
+    acc.push(`${cur}=${data[cur]}`)
+    return acc
+  }, []).join('&')
+}
+jsonp({url:'www.xxx.com',data:{a:1,b:2}})
 ```
 
 ### 继承
