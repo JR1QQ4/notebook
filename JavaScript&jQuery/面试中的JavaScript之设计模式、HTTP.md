@@ -611,6 +611,106 @@ HTTP状态码分类：
 
 ![浏览器请求分析](./images/http.png)
 
+## WebSockets
+
+WebSockets 是一种先进的技术。它可以在用户的浏览器和服务器之间打开交互式通信会话。使用此API，您可以向服务器发送消息并接收事件驱动的响应，而无需通过轮询服务器的方式以获得响应。
+
+WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+
+在 WebSocket API 中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。
+
+Ajax 轮询是在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP请求，然后由服务器返回最新的数据给客户端的浏览器。缺点，即浏览器需要不断的向服务器发出请求，然而HTTP请求可能包含较长的头部，其中真正有效的数据可能只是很小的一部分，显然这样会浪费很多的带宽等资源。
+
+主要接口：
+
+- WebSocket：用于连接WebSocket服务器的主要接口，之后可以在这个连接上发送 和接受数据
+- CloseEvent：连接关闭时WebSocket对象发送的事件
+- MessageEvent：当从服务器获取到消息的时候WebSocket对象触发的事件
+
+### WebSocket
+
+Websocket 使用 ws 或 wss 的统一资源标志符，类似于 HTTPS，其中 wss 表示在 TLS 之上的 Websocket。如：`ws://example.com/wsapi`、`wss://secure.example.com/`。
+
+Websocket 使用和 HTTP 相同的 TCP 端口，可以绕过大多数防火墙的限制。默认情况下，Websocket 协议使用 80 端口；运行在 TLS 之上时，默认使用 443 端口。
+
+Socket 是传输控制层协议，WebSocket 是应用层协议。
+
+```javascript
+// url 要连接的URL；这应该是WebSocket服务器将响应的URL
+// protocols 一个协议字符串或者一个包含协议字符串的数组；这些字符串用于指定子协议，这样单个服务器可以实现多个WebSocket子协议
+var aWebSocket = new WebSocket(url [, protocols]); // 返回一个 WebSocket 对象
+```
+
+属性：
+
+- WebSocket.bufferedAmount：未发送至服务器的字节数
+- WebSocket.extensions：服务器选择的扩展
+- WebSocket.onclose：用于指定连接关闭后的回调函数
+- WebSocket.onerror：用于指定连接失败后的回调函数
+- WebSocket.onmessage：用于指定当从服务器接受到信息时的回调函数
+- WebSocket.onopen：用于指定连接成功后的回调函数
+- WebSocket.protocol（只读）：服务器选择的下属协议
+- WebSocket.readyState（只读）：当前的链接状态
+- WebSocket.url（只读）：WebSocket 的绝对路径
+
+```javascript
+var bufferedAmount = aWebSocket.bufferedAmount;
+var extensions = aWebSocket.extensions;
+aWebSocket.onclose = function(event) {
+  console.log("WebSocket is closed now.");
+};
+aWebSocket.onerror = function(event) {
+  console.error("WebSocket error observed:", event);
+};
+aWebSocket.onmessage = function(event) {
+  console.debug("WebSocket message received:", event);
+};
+aWebSocket.onopen = function(event) {
+  console.log("WebSocket is open now.");
+};
+var protocol = aWebSocket.protocol;
+var readyState = aWebSocket.readyState; // 0 - 正在链接中，1 - 已经链接并且可以通讯，2 - 连接正在关闭，3 - 连接已关闭或者没有链接成功
+var url = aWebSocket.url;
+```
+
+方法：
+
+- WebSocket.close([code[, reason]])：关闭当前链接；code如果没有传这个参数，默认使用1005；reason 连接关闭的原因
+- WebSocket.send(data)：向服务器发送数据，可发送的类型：USVString、ArrayBuffer、Blob、ArrayBufferView
+
+```javascript
+function WebSocketTest() {
+  if ("WebSocket" in window) {
+    alert("您的浏览器支持 WebSocket!");
+    // 打开一个 web socket
+    var ws = new WebSocket("ws://localhost:9998/echo");
+    ws.onopen = function() {
+      // Web Socket 已连接上，使用 send() 方法发送数据
+      ws.send("发送数据");
+      alert("数据发送中...");
+    };
+    ws.onmessage = function (evt) { 
+      var received_msg = evt.data;
+      alert("数据已接收...");
+    };
+    ws.onclose = function() { 
+      // 关闭 websocket
+      alert("连接已关闭..."); 
+    };
+  } else {
+    // 浏览器不支持 WebSocket
+    alert("您的浏览器不支持 WebSocket!");
+  }
+}
+
+const socket = new WebSocket('ws://localhost:8080');
+socket.addEventListener('open', function (event) {
+    socket.send('Hello Server!');
+});
+socket.addEventListener('message', function (event) {
+    console.log('Message from server ', event.data);
+});
+```
 
 参考文章：
 
