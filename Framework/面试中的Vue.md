@@ -291,3 +291,22 @@ router.afterEach((to, from) => {
   // ...
 })
 ```
+
+3.keep-alive 与路由
+
+```html
+<!-- 逗号分隔字符串 -->
+<keep-alive include="a,b">
+  <component :is="view"></component>
+</keep-alive>
+
+<!-- 正则表达式 (使用 `v-bind`) -->
+<keep-alive :include="/a|b/">
+  <component :is="view"></component>
+</keep-alive>
+
+<!-- 数组 (使用 `v-bind`) -->
+<keep-alive :include="['a', 'b']">
+  <component :is="view"></component>
+</keep-alive>
+```
