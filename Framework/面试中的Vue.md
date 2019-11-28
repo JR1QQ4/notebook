@@ -263,3 +263,11 @@ router.beforeEach((to, from, next) => {
   // ...
 })
 ```
+
+2.全局后置钩子：和守卫不同的是，这些钩子不会接受 `next` 函数也不会改变导航本身：
+
+```javascript
+router.afterEach((to, from) => {
+  // ...
+})
+```
