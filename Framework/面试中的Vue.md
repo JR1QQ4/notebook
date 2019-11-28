@@ -249,7 +249,7 @@ Vue Router 是 Vue.js 官方的路由管理器。它和 Vue.js 的核心深度�
 
 “导航”表示路由正在发生改变。记住**参数或查询的改变并不会触发进入/离开的导航守卫**。你可以通过观察 `$route` 对象来应对这些变化，或使用 `beforeRouteUpdate` 的组件内守卫。
 
-1.全局前置守卫，你可以使用 `router.beforeEach` 注册一个全局前置守卫：
+1.全局前置守卫，你可以使用 `router.beforeEach` 注册一个全局前置守卫。当一个导航触发时，全局前置守卫按照创建顺序调用。守卫是异步解析执行，此时导航在所有守卫 resolve 完之前一直处于 **等待中**。
 
 ```javascript
 const router = new VueRouter({ ... })
