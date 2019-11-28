@@ -186,4 +186,30 @@ const app = new Vue({
 </script>
 ```
 
-### 
+### 组件间的参数传递
+
+1.父组件与子组件传值：
+
+- 父组件传给子组件：子组件通过props方法接受数据
+- 子组件传给父组件：$emit方法传递参数
+
+2.非父子组件间的数据传递，兄弟组件传值：
+
+- eventBus，就是创建一个事件中心，相当于中转站，可以用它来传递事件和接收事件，项目比较小时，用这个比较合适
+- VUEX
+
+```javascript
+// main.js 
+// 创建事件总线，用于非兄弟组件之间的通信
+Vue.prototype.$bus = new Vue();
+
+// 组件一，发送事件
+// 为事件总线添加一个事件
+this.$bus.$emit("goodsItemImgLoad");
+
+// 组件二，注册事件
+this.$bus.$on("goodsItemImgLoad", () => {});
+
+// 取消事件
+this.$bus.$off("goodsItemImgLoad", () => {});
+```
