@@ -27,3 +27,9 @@ Vue生命周期：Vue 实例从创建到销毁的过程，从开始创建、初�
 第一次页面加载会触发哪些钩子函数：beforeCreate、created、beforeMount、mounted
 
 Dom 渲染在哪个周期中就已经完成：mounted
+
+### 双向数据绑定原理
+
+vue实现数据双向绑定原理：采用 **数据劫持结合发布者-订阅者模式** 的方式，通过 **Object.defineProperty()** 来劫持各个属性的 `setter` ， `getter`， 在数据变动时发布消息给订阅者，触发相应监听回调。当把一个普通 Javascript 对象传给 Vue 实例来作为它的 data 选项时，Vue 将遍历它的属性，用 **Object.defineProperty()** 将它们转为 **getter、setter** 。用户看不到  **getter、setter**， 但是在内部它们让 Vue 追踪依赖，在属性被访问和修改时通知变化。
+
+
