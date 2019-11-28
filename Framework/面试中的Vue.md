@@ -47,141 +47,141 @@ js实现简单的双向绑定：
 <script>
 class Vue {
 constructor(opt){
-// 1.保存数据
-this.$opt = opt
-this.$data = opt.data
-this.$el = opt.el
+  // 1.保存数据
+  this.$opt = opt
+  this.$data = opt.data
+  this.$el = opt.el
 
-// 2.将data添加到响应式系统中
-new Observer(this.$data)
+  // 2.将data添加到响应式系统中
+  new Observer(this.$data)
 
-// 3.代理this.$data的数据
-Object.keys(this.$data).forEach(key => {
-this._proxy(key)
-})
+  // 3.代理this.$data的数据
+  Object.keys(this.$data).forEach(key => {
+    this._proxy(key)
+  })
 
-// 4.处理el
-new Compiler(this.$el, this)
+  // 4.处理el
+  new Compiler(this.$el, this)
 }
 
 _proxy(key){
-Object.defineProperty(this, key, {
-enumerable: true,
-configurable: true,
-get(){
-return this.$data[key]
-},
-set(newValue){
-this.$data[key] = newValue
-}
-})
+  Object.defineProperty(this, key, {
+    enumerable: true,
+    configurable: true,
+    get(){
+      return this.$data[key]
+    },
+    set(newValue){
+      this.$data[key] = newValue
+    }
+  })
 }
 }
 
 class Observer {
-constructor(data){
-this.data = data
-Object.keys(data).forEach(key => {
-this.defineReactive(this.data, key, data[key])
-})
+  constructor(data){
+    this.data = data
+    Object.keys(data).forEach(key => {
+      this.defineReactive(this.data, key, data[key])
+    })
 }
 defineReactive(data, key, val) {
-// 一一对应，属性key -> Dep对象
-const dep = new Dep()
-Object.defineProperty(data, key, {
-enumerable: true,
-configurable: true,
-get(){
-if (Dep.target) {
-// 添加的 watcher
-dep.addSub(Dep.target)
-}
-return val
-},
-set(newValue) {
-if (newValue === val) {
-return
-}
-val = newValue
-dep.notify()
-}	
-})				
+  // 一一对应，属性key -> Dep对象
+  const dep = new Dep()
+  Object.defineProperty(data, key, {
+    enumerable: true,
+    configurable: true,
+    get(){
+      if (Dep.target) {
+        // 添加的 watcher
+        dep.addSub(Dep.target)
+      }
+      return val
+    },
+    set(newValue) {
+      if (newValue === val) {
+        return
+      }
+      val = newValue
+      dep.notify()
+    }	
+  })				
 }
 }
 
 class Dep {
-constructor() {
-this.subs = []
-}
-addSub(sub) {
-this.subs.push(sub)
-}
-notify() {
-this.subs.forEach(sub => {
-sub.update()
-})
-}
+  constructor() {
+    this.subs = []
+  }
+  addSub(sub) {
+    this.subs.push(sub)
+  }
+  notify() {
+    this.subs.forEach(sub => {
+      sub.update()
+    })
+  }
 }
 
 class Watcher {
-constructor(node, name, vm) {
-this.node = node
-this.name = name
-this.vm = vm
-Dep.target = this
-this.update()
-Dep.target = null
-}
-update() {
-this.node.nodeValue = this.vm[this.name] // 会调用 get 
-}
+  constructor(node, name, vm) {
+    this.node = node
+    this.name = name
+    this.vm = vm
+    Dep.target = this
+    this.update()
+    Dep.target = null
+  }
+  update() {
+    this.node.nodeValue = this.vm[this.name] // 会调用 get 
+  }
 }
 
 const reg = /\{\{(.*)\}\}/
 class Compiler {
-constructor(el, vm) {
-this.el = document.querySelector(el)
-this.vm = vm
+  constructor(el, vm) {
+    this.el = document.querySelector(el)
+    this.vm = vm
 
-this.frag = this._createFragment()
-this.el.appendChild(this.frag)
-}
-_createFragment() {
-const frag = document.createDocumentFragment()
+    this.frag = this._createFragment()
+    this.el.appendChild(this.frag)
+  }
+  _createFragment() {
+    const frag = document.createDocumentFragment()
 
-let child
-while (child = this.el.firstChild) {
-this._compile(child)
-frag.appendChild(child)
-}
-return frag
-}
-_compile(node) {
-if (node.nodeType === 1) { // 标签节点
-const attrs = node.attributes
-if (attrs.hasOwnProperty('v-model')) {
-const name = attrs['v-model'].nodeValue
-node.value = this.vm[name]
-node.addEventListener('input', e => {
-this.vm[name] = e.target.value
-})
-}
-}
-if (node.nodeType === 3) { // 文本节点					
-if (reg.test(node.nodeValue)) {
-const name = RegExp.$1.trim()
-new Watcher(node, name, this.vm)
-}
-}
-}
+    let child
+    while (child = this.el.firstChild) {
+      this._compile(child)
+      frag.appendChild(child)
+    }
+    return frag
+  }
+  _compile(node) {
+    if (node.nodeType === 1) { // 标签节点
+      const attrs = node.attributes
+      if (attrs.hasOwnProperty('v-model')) {
+        const name = attrs['v-model'].nodeValue
+        node.value = this.vm[name]
+        node.addEventListener('input', e => {
+          this.vm[name] = e.target.value
+        })
+      }
+    }
+    if (node.nodeType === 3) { // 文本节点					
+      if (reg.test(node.nodeValue)) {
+        const name = RegExp.$1.trim()
+        new Watcher(node, name, this.vm)
+      }
+    }
+  }
 }
 </script>
 <script>
 const app = new Vue({
-el: '#app',
-data: {
-msg: 'Hello World!'
-}
+  el: '#app',
+  data: {
+    msg: 'Hello World!'
+  }
 })
 </script>
 ```
