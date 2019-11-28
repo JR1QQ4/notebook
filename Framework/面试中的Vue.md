@@ -252,7 +252,24 @@ Vue Router 是 Vue.js 官方的路由管理器。它和 Vue.js 的核心深度�
 1.全局前置守卫，你可以使用 `router.beforeEach` 注册一个全局前置守卫。当一个导航触发时，全局前置守卫按照创建顺序调用。守卫是异步解析执行，此时导航在所有守卫 resolve 完之前一直处于 **等待中**。
 
 ```javascript
-const router = new VueRouter({ ... })
+const router = new VueRouter({ [
+  {
+    path: "/home",
+    name: "home",
+    component: Home,
+    meta: {
+      title: "首页"
+    }
+  },
+  {
+    path: "/category",
+    name: "category",
+    component: () => import("../views/category/Category.vue"),
+    meta: {
+      title: "分类"
+    }
+  }
+] })
 
 /*
 * to: Route: 即将要进入的目标 路由对象
@@ -260,7 +277,10 @@ const router = new VueRouter({ ... })
 * next: Function: 一定要调用该方法来 resolve 这个钩子，否则不会跳转路由。执行效果依赖 next 方法的调用参数。
 */
 router.beforeEach((to, from, next) => {
-  // ...
+  if (to.matched[0].meta) {
+    document.title = to.matched[0].meta.title;
+  }
+  next();
 })
 ```
 
