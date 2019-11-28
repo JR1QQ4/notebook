@@ -18,4 +18,12 @@ MVVM 是 Model-View-ViewModel 的缩写 ：
 
 ![lifecycle](./images/lifecycle.png)
 
+Vue生命周期：Vue 实例从创建到销毁的过程，从开始创建、初始化数据、编译模板、挂载Dom→渲染、更新→渲染、销毁等一系列过程，称之为 Vue 的生命周期。
 
+作用：它的生命周期中有多个事件钩子，让我们在控制整个Vue实例的过程时更容易形成好的逻辑。
+
+生命周期钩子：8个，beforeCreate、created、beforeMount、mounted、beforeUpdate、updated、beforeDestory、destoryed
+
+第一次页面加载会触发哪些钩子函数：beforeCreate、created、beforeMount、mounted
+
+Dom 渲染在哪个周期中就已经完成：mounted
