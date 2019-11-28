@@ -35,3 +35,153 @@ vue实现数据双向绑定原理：采用 **数据劫持结合发布者-订阅�
 ![coderwhy 的响应式原理图](./images/principle.png)
 
 
+vue的数据双向绑定 将MVVM作为数据绑定的入口，整合Observer，Compile和Watcher三者，通过Observer来监听自己的model的数据变化，通过Compile来解析编译模板指令（vue中是用来解析 {{}}），最终利用watcher搭起observer和Compile之间的通信桥梁，达到数据变化 —>视图更新；视图交互变化（input）—>数据model变更双向绑定效果。
+
+js实现简单的双向绑定：
+
+```html
+<div id="app">
+<input type="text" v-model="msg">
+{{msg}}
+</div>
+<script>
+class Vue {
+constructor(opt){
+// 1.保存数据
+this.$opt = opt
+this.$data = opt.data
+this.$el = opt.el
+
+// 2.将data添加到响应式系统中
+new Observer(this.$data)
+
+// 3.代理this.$data的数据
+Object.keys(this.$data).forEach(key => {
+this._proxy(key)
+})
+
+// 4.处理el
+new Compiler(this.$el, this)
+}
+
+_proxy(key){
+Object.defineProperty(this, key, {
+enumerable: true,
+configurable: true,
+get(){
+return this.$data[key]
+},
+set(newValue){
+this.$data[key] = newValue
+}
+})
+}
+}
+
+class Observer {
+constructor(data){
+this.data = data
+Object.keys(data).forEach(key => {
+this.defineReactive(this.data, key, data[key])
+})
+}
+defineReactive(data, key, val) {
+// 一一对应，属性key -> Dep对象
+const dep = new Dep()
+Object.defineProperty(data, key, {
+enumerable: true,
+configurable: true,
+get(){
+if (Dep.target) {
+// 添加的 watcher
+dep.addSub(Dep.target)
+}
+return val
+},
+set(newValue) {
+if (newValue === val) {
+return
+}
+val = newValue
+dep.notify()
+}	
+})				
+}
+}
+
+class Dep {
+constructor() {
+this.subs = []
+}
+addSub(sub) {
+this.subs.push(sub)
+}
+notify() {
+this.subs.forEach(sub => {
+sub.update()
+})
+}
+}
+
+class Watcher {
+constructor(node, name, vm) {
+this.node = node
+this.name = name
+this.vm = vm
+Dep.target = this
+this.update()
+Dep.target = null
+}
+update() {
+this.node.nodeValue = this.vm[this.name] // 会调用 get 
+}
+}
+
+const reg = /\{\{(.*)\}\}/
+class Compiler {
+constructor(el, vm) {
+this.el = document.querySelector(el)
+this.vm = vm
+
+this.frag = this._createFragment()
+this.el.appendChild(this.frag)
+}
+_createFragment() {
+const frag = document.createDocumentFragment()
+
+let child
+while (child = this.el.firstChild) {
+this._compile(child)
+frag.appendChild(child)
+}
+return frag
+}
+_compile(node) {
+if (node.nodeType === 1) { // 标签节点
+const attrs = node.attributes
+if (attrs.hasOwnProperty('v-model')) {
+const name = attrs['v-model'].nodeValue
+node.value = this.vm[name]
+node.addEventListener('input', e => {
+this.vm[name] = e.target.value
+})
+}
+}
+if (node.nodeType === 3) { // 文本节点					
+if (reg.test(node.nodeValue)) {
+const name = RegExp.$1.trim()
+new Watcher(node, name, this.vm)
+}
+}
+}
+}
+</script>
+<script>
+const app = new Vue({
+el: '#app',
+data: {
+msg: 'Hello World!'
+}
+})
+</script>
+```
