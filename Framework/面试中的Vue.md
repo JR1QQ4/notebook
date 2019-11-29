@@ -221,6 +221,7 @@ this.$bus.$off("goodsItemImgLoad", () => {});
 	- 注：provide 和 inject 主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。（官方文档描述）
 
 ```javascript
+// 父组件
 export default {
   data () {
     return {}
@@ -228,6 +229,14 @@ export default {
   provide: {
     index: '来自index的数据'
   }
+}
+
+// 子组件
+export default {
+  data () {
+    return {}
+  },
+  inject: ['index']  // 直接可以在页面使用index或在js中进行赋值
 }
 ```
 
