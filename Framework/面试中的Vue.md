@@ -214,6 +214,10 @@ this.$bus.$on("goodsItemImgLoad", () => {});
 this.$bus.$off("goodsItemImgLoad", () => {});
 ```
 
+3.其它传值的方式：
+
+- provide/ inject：父组件中通过provide来提供变量, 然后再子组件中通过inject来注入变量。假设A为父组件B和C均为A的子组件，D为B的子组件，则在A组件中使用provide定义变量，在B、C、D组件中均可通过inject拿到传过来的值。（provide中定义的变量不可在父组件中 使用）
+
 ### hash模式 和 history模式
 
 1.hash模式：在浏览器中符号“#”，#以及#后面的字符称之为hash，用window.location.hash读取； 特点：hash虽然在URL中，但不被包括在HTTP请求中；用来指导浏览器动作，对服务端安全无用，hash不会重加载页面。hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 `www.xxx.com `，因此对于后端来说，即使没有做到对路由的全覆盖，也不会返回 404 错误。
