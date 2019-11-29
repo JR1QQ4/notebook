@@ -47,7 +47,10 @@ computed: {
     }
   }
 }
+// 运行 vm.fullName = 'John Doe' 时，setter 会被调用，vm.firstName 和 vm.lastName 也会相应地被更新
 ```
+
+### 计算属性 vs 侦听属性
 
 ### 双向数据绑定原理
 
