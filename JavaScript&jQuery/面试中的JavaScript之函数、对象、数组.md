@@ -103,6 +103,27 @@ let arrowObj = {
 arrowObj.arrFun();
 ```
 
+### ES6中块级作用域和函数声明
+
+ES5 规定，函数只能在顶层作用域和函数作用域之中声明，不能在块级作用域声明。但是，浏览器没有遵守这个规定，为了兼容以前的旧代码，还是支持在块级作用域之中声明函数，不会报错。
+
+ES5环境下可以实现下面代码：
+
+```javascript
+demo()  // 打印 bbb
+
+var flag = true
+if (flag) {
+  function demo() {
+    console.log('aaa')
+  }
+} else {
+  function demo() {
+    console.log('bbb')
+  }
+}
+```
+
 ### call,apply和bind
 
 1.IE5之前不支持`call`和`apply`，`bind`是ES5出来的，`call`和`apply`可以调用函数，改变this，实现继承和借用别的对象的方法;
@@ -161,7 +182,7 @@ Object.prototype.toString.call({}) // "[object Object]"，判断字符类型
 
 6.bind()方法创建一个新的函数，在bind()被调用时，这个新函数的this被bind的第一个参数指定，其余的参数将作为新函数的参数供调用时使用，不兼容IE8：
 
-**bind 是创建一个新的函数，我们必须要手动去调用。apply和call是立即执行**
+**bind 是创建一个新的函数，我们必须要手动去调用。apply和call是立即执行。**
 
 ```javascript
 const module = {
