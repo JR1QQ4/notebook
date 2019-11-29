@@ -269,12 +269,12 @@ export default {
 首先在父组件A中调用子组件three：`<custom-three @customEvent="customEvent" />`,此时在子组件A中使用$listeners接收，拿到的是一个对象{customEvent: function(){...}},在three组件中再调用子组件four，并使用v-on将$listeners绑定在子组件上，此时在子组件four中即可直接直接访问customEvent或使用$listeners访问customEvent。
 
 ```javascript
+// 父组件A
 <template>
   <div>
     <custom-three :custom="custom" :custon="custon" @customEvent="customEvent"></custom-three>
   </div>
 </template>
-
 <script>
   import customThree from './chuanzhi/three'
   export default {
