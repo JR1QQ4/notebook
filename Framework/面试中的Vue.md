@@ -50,6 +50,19 @@ computed: {
 // 运行 vm.fullName = 'John Doe' 时，setter 会被调用，vm.firstName 和 vm.lastName 也会相应地被更新
 ```
 
+### watch监听对象
+
+如果只是监听obj内的某一个属性变化，可以直接obj.key进行监听：
+
+```javascript
+watch: {
+  'obj.question': function (newQuestion, oldQuestion) {
+    this.answer = 'Waiting for you to stop typing...'
+    this.debouncedGetAnswer()
+  }
+}
+```
+
 ### 计算属性 vs 侦听属性
 
 ### 双向数据绑定原理
