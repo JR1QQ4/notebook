@@ -249,6 +249,7 @@ export default {
 - `props: ['custom']` 时，$attrs = {custon: 'ton'};
 - `props: []` 时，$attrs = {custom: 'tom', custon: 'ton'};
 
+此时，在three组件中引入four子组件，并使用v-bind将$attrs绑定在组件上`<custom-four v-bind="$attrs" />`即可在four中使用props或$attrs接收,按此规律可一直传递。
 
 
 ### hash模式 和 history模式
