@@ -295,6 +295,32 @@ export default {
     }
   }
 </script>
+
+// 子组件three
+<template>
+  <div>
+    <p>three---{{ custom }}</p>
+    <p>attr---{{$attrs}}</p>
+    <p>-------------------------------------</p>
+    <custom-four v-bind="$attrs" v-on="$listeners"></custom-four>
+  </div>
+</template>
+<script>
+import customFour from './four'
+export default {
+data() {
+return {}
+},
+components: {
+customFour
+},
+props: ['custom'],
+inheritAttrs:false
+created() {
+console.log('1', this.$listeners)
+}
+}
+</script>
 ```
 
 
