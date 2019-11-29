@@ -124,6 +124,25 @@ if (flag) {
 }
 ```
 
+执行此代码时，会先将函数声明提升到顶部而并不会根据判断在下面进行声明，打印bbb是因为第一个声明被第二个声明覆盖了，实际为下面代码：
+
+```javascript
+function demo() {
+  console.log('aaa')
+}
+function demo() {
+  console.log('bbb')
+}
+var flag
+demo()  // 打印 bbb
+flag = true
+if (flag) {
+
+} else {
+
+}
+```
+
 ### call,apply和bind
 
 1.IE5之前不支持`call`和`apply`，`bind`是ES5出来的，`call`和`apply`可以调用函数，改变this，实现继承和借用别的对象的方法;
