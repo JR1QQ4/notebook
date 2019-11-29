@@ -153,6 +153,23 @@ ES6 引入了块级作用域，明确允许在块级作用域之中声明函数�
 
 **注意，上面三条规则只对 ES6 的浏览器实现有效，其他环境的实现不用遵守，还是将块级作用域的函数声明当作let处理。**
 
+```javascript
+var flag
+var demo
+demo()  // demo is not a function
+
+flag = true
+if (flag) {
+  function demo() {
+    console.log('aaa')
+  }
+} else {
+  function demo() {
+   console.log('bbb')
+  }
+}
+```
+
 
 ### call,apply和bind
 
