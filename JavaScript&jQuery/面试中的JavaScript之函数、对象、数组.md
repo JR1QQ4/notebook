@@ -161,6 +161,8 @@ Object.prototype.toString.call({}) // "[object Object]"，判断字符类型
 
 6.bind()方法创建一个新的函数，在bind()被调用时，这个新函数的this被bind的第一个参数指定，其余的参数将作为新函数的参数供调用时使用，不兼容IE8：
 
+**bind 是创建一个新的函数，我们必须要手动去调用。apply和call是立即执行**
+
 ```javascript
 const module = {
   x: 42,
