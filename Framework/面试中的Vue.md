@@ -263,6 +263,8 @@ export default {
 在子组件中添加inheritAttrs可以将div标签的 custon="ton" 隐藏，inheritAttrs默认值为true，将其设为false即可隐藏。注意：将inheritAttrs设为false并不会影响$attrs的使用。
 
 
+
+
 ### hash模式 和 history模式
 
 1.hash模式：在浏览器中符号“#”，#以及#后面的字符称之为hash，用window.location.hash读取； 特点：hash虽然在URL中，但不被包括在HTTP请求中；用来指导浏览器动作，对服务端安全无用，hash不会重加载页面。hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 `www.xxx.com `，因此对于后端来说，即使没有做到对路由的全覆盖，也不会返回 404 错误。
