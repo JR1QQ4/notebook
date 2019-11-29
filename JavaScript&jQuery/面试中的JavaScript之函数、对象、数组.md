@@ -1919,3 +1919,4 @@ function stopDefault(e) {
 - [浏览器的渲染：过程与原理](https://juejin.im/entry/59e1d31f51882578c3411c77)
 - [史上最详细的经典面试题 从输入URL到看到页面发生了什么？](https://juejin.im/post/5cc573c85188252e741ccbb6#heading-67)
 - [让虚拟DOM和DOM-diff不再成为你的绊脚石](https://juejin.im/post/5c8e5e4951882545c109ae9c)
+- [面试时面试官想要听到什么答案（关于es6中let、const、promise、块级作用域的问题）](https://juejin.im/post/5db13c1b518825644c4a69e1)
