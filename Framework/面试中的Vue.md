@@ -324,7 +324,7 @@ export default {
 }
 ```
 
-（2）$attrs
+（2）$attrs ：包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)
 
 在父组件A中调用子组件three：`<custom-three :custom="custom" :custon="custon" />`，子组件three使用props进行接收，未被子组件使用props接收的可以使用$attrs拿到传递的值，即three组件分为以下情况：
 
