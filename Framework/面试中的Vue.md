@@ -315,6 +315,8 @@ router.afterEach((to, from) => {
 
 只用来读取的状态集中放在store中； 改变状态的方式是提交mutations，这是个同步的事物； 异步逻辑应该封装在action中。在main.js引入store，注入。新建了一个目录store，….. export 。场景有：单页应用中，组件之间的状态、音乐播放、登录状态、加入购物车。
 
+
+
 ## 问题简答
 
 1.css只在当前组件起作用
@@ -343,6 +345,32 @@ router.afterEach((to, from) => {
 
 9.什么是vue的计算属性？
 答：在模板中放入太多的逻辑会让模板过重且难以维护，在需要对数据进行复杂处理，且可能多次使用的情况下，尽量采取计算属性的方式。好处：①使得数据处理结构清晰；②依赖于数据，数据更新，处理结果自动更新；③计算属性内部this指向vm实例；④在template调用时，直接写计算属性名即可；⑤常用的是getter方法，获取数据，也可以使用set方法改变数据；⑥相较于methods，不管依赖的数据变不变，methods都会重新计算，但是依赖数据不变的时候computed从缓存中获取，不会重新计算。
+
+10.过滤器？
+
+```javascript
+<divid="app"><inputtype="text"v-model="msg" />
+  {{msg| capitalize }}
+</div>
+var vm=new Vue({
+  el:"#app",
+  data:{
+    msg:''
+  },
+  filters: {
+    capitalize: function (value) {
+      if (!value) return''value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
+      }
+    }
+})
+
+// 全局过滤器
+Vue.filter('capitalize', function (value) {
+  if (!value) return''value = value.toString()
+  return value.charAt(0).toUpperCase() + value.slice(1)
+})
+```
 
 10.vue等单页面应用及其优缺点
 答：优点：Vue 的目标是通过尽可能简单的 API 实现响应的数据绑定和组合的视图组件，核心是一个响应的数据绑定系统。MVVM、数据驱动、组件化、轻量、简洁、高效、快速、模块友好。
