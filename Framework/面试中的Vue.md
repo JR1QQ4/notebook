@@ -356,7 +356,56 @@ observable让一个对象可响应。Vue 内部会用它来处理 data 函数返
 返回的对象可以直接用于渲染函数和计算属性内，并且会在发生改变时触发相应的更新。也可以作为最小化的跨组件状态存储器，用于简单的场景：在组件1中调用setCount使count加1或减1，各个组件内调用的count都将进行改变，并会触发组件刷新。
 
 ```javascript
+// store.js文件
+import vue from 'vue';
+export const store =  vue.observable({count: 0});
+export const mutation = {
+  setCount( count ){
+    store.count = count;
+  }
+}
 
+// 组件1
+<template>
+  <div class="hello">
+    <p @click="setCount(testCount + 1)">+</p>
+    <p @click="setCount(testCount - 1)">-</p>
+    <test />
+    <p>{{testCount}}</p>
+  </div>
+</template>
+<script>
+import test from './test'
+import { store,  mutation} from './store.js'
+export default {
+  name: 'HelloWorld',
+  components: {
+    test
+  },
+  methods: {
+    setCount: mutation.setCount
+  },
+  computed: {
+    testCount(){
+      return store.count
+    }
+  }
+}
+
+// 组件2
+<template>
+  <div>test{{testCount}}</div>
+</template>
+<script>
+import { store } from './store.js';
+export default {
+  computed: {
+    testCount(){
+      return store.count
+    }
+  }
+}
+</script>
 ```
 
 
