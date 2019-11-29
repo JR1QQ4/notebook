@@ -63,6 +63,21 @@ watch: {
 }
 ```
 
+如果对整个obj深层监听：
+
+```javascript
+watch: {
+  obj: {
+    handler: function (newQuestion, oldQuestion) {
+      this.answer = 'Waiting for you to stop typing...'
+      this.debouncedGetAnswer()
+    },
+    deep: true,
+    immediate: true
+  }
+}
+```
+
 ### 计算属性 vs 侦听属性
 
 ### 双向数据绑定原理
