@@ -292,7 +292,7 @@ router.afterEach((to, from) => {
 })
 ```
 
-3.keep-alive 与路由
+3.keep-alive 与路由：keep-alive是 Vue 内置的一个组件，可以使被包含的组件保留状态，或避免重新渲染
 
 ```html
 <!-- 逗号分隔字符串 -->
@@ -310,3 +310,7 @@ router.afterEach((to, from) => {
   <component :is="view"></component>
 </keep-alive>
 ```
+
+## Vuex
+
+只用来读取的状态集中放在store中； 改变状态的方式是提交mutations，这是个同步的事物； 异步逻辑应该封装在action中。在main.js引入store，注入。新建了一个目录store，….. export 。场景有：单页应用中，组件之间的状态、音乐播放、登录状态、加入购物车。
