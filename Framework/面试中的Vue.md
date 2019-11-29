@@ -262,7 +262,9 @@ export default {
 
 在子组件中添加inheritAttrs可以将div标签的 custon="ton" 隐藏，inheritAttrs默认值为true，将其设为false即可隐藏。注意：将inheritAttrs设为false并不会影响$attrs的使用。
 
+（3）$listeners
 
+使用$attrs将父组件的值隔代传给子组件，$listeners就是将方法从父组件隔代传给子组件，实现子组件调用时将子组件的值隔代传给父组件。
 
 
 ### hash模式 和 history模式
