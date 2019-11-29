@@ -266,6 +266,9 @@ export default {
 
 使用$attrs将父组件的值隔代传给子组件，$listeners就是将方法从父组件隔代传给子组件，实现子组件调用时将子组件的值隔代传给父组件。
 
+首先在父组件A中调用子组件three：<custom-three @customEvent="customEvent" />,此时在子组件A中使用$listeners接收，拿到的是一个对象{customEvent: function(){...}},在three组件中再调用子组件four，并使用v-on将$listeners绑定在子组件上，此时在子组件four中即可直接直接访问customEvent或使用$listeners访问customEvent。
+
+
 
 ### hash模式 和 history模式
 
