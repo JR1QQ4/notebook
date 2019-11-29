@@ -216,9 +216,10 @@ this.$bus.$off("goodsItemImgLoad", () => {});
 
 3.其它传值的方式：
 
-- provide/ inject：父组件中通过provide来提供变量, 然后再子组件中通过inject来注入变量。
-	- 假设A为父组件B和C均为A的子组件，D为B的子组件，则在A组件中使用provide定义变量，在B、C、D组件中均可通过inject拿到传过来的值。（provide中定义的变量不可在父组件中 使用）
-	- 注：provide 和 inject 主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。（官方文档描述）
+（1） provide/ inject：父组件中通过provide来提供变量, 然后再子组件中通过inject来注入变量。
+
+- 假设A为父组件B和C均为A的子组件，D为B的子组件，则在A组件中使用provide定义变量，在B、C、D组件中均可通过inject拿到传过来的值。（provide中定义的变量不可在父组件中 使用）
+- 注：provide 和 inject 主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。（官方文档描述）
 
 ```javascript
 // 父组件
