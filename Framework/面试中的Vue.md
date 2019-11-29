@@ -22,11 +22,32 @@ Vue生命周期：Vue 实例从创建到销毁的过程，从开始创建、初�
 
 作用：它的生命周期中有多个事件钩子，让我们在控制整个Vue实例的过程时更容易形成好的逻辑。
 
-生命周期钩子：8个，beforeCreate、created（首次拿到data中定义的数据）、beforeMount、mounted、beforeUpdate、updated、beforeDestory、destoryed
+生命周期钩子：8个，beforeCreate、created（首次拿到data中定义的数据）、beforeMount、mounted（dom树渲染结束，可访问dom结构）、beforeUpdate、updated、beforeDestory、destoryed
 
 第一次页面加载会触发哪些钩子函数：beforeCreate、created、beforeMount、mounted
 
 Dom 渲染在哪个周期中就已经完成：mounted
+
+### computed中的getter和setter
+
+computed的默认方式，只使用了其中的getter，但setter可以设置值：
+
+```javascript
+computed: {
+  fullName: {
+    // getter
+    get: function () {
+      return this.firstName + ' ' + this.lastName
+    },
+    // setter
+    set: function (newValue) {
+      var names = newValue.split(' ')
+      this.firstName = names[0]
+      this.lastName = names[names.length - 1]
+    }
+  }
+}
+```
 
 ### 双向数据绑定原理
 
