@@ -308,17 +308,17 @@ export default {
 <script>
 import customFour from './four'
 export default {
-data() {
-return {}
-},
-components: {
-customFour
-},
-props: ['custom'],
-inheritAttrs:false
-created() {
-console.log('1', this.$listeners)
-}
+  data() {
+    return {}
+  },
+  components: {
+    customFour
+  },
+  props: ['custom'],
+  inheritAttrs:false
+  created() {
+    console.log('1', this.$listeners)
+  }
 }
 </script>
 ```
