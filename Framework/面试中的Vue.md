@@ -251,6 +251,8 @@ export default {
 
 此时，在three组件中引入four子组件，并使用v-bind将$attrs绑定在组件上`<custom-four v-bind="$attrs" />`即可在four中使用props或$attrs接收,按此规律可一直传递。
 
+**并且未被组件使用的变量将显示在html结构中**,例:
+
 
 ### hash模式 和 history模式
 
