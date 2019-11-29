@@ -241,6 +241,16 @@ export default {
 }
 ```
 
+（2）$attrs
+
+在父组件A中调用子组件three：`<custom-three :custom="custom" :custon="custon" />`，子组件three使用props进行接收，未被子组件使用props接收的可以使用$attrs拿到传递的值，即three组件分为以下情况：
+
+- `props: ['custom','custon]` 时，$attrs = {};
+- `props: ['custom']` 时，$attrs = {custon: 'ton'};
+- `props: []` 时，$attrs = {custom: 'tom', custon: 'ton'};
+
+
+
 ### hash模式 和 history模式
 
 1.hash模式：在浏览器中符号“#”，#以及#后面的字符称之为hash，用window.location.hash读取； 特点：hash虽然在URL中，但不被包括在HTTP请求中；用来指导浏览器动作，对服务端安全无用，hash不会重加载页面。hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 `www.xxx.com `，因此对于后端来说，即使没有做到对路由的全覆盖，也不会返回 404 错误。
