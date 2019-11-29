@@ -260,6 +260,8 @@ export default {
 </div>
 ```
 
+在子组件中添加inheritAttrs可以将div标签的 custon="ton" 隐藏，inheritAttrs默认值为true，将其设为false即可隐藏。注意：将inheritAttrs设为false并不会影响$attrs的使用。
+
 
 ### hash模式 和 history模式
 
