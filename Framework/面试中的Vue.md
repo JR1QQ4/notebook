@@ -321,6 +321,32 @@ export default {
   }
 }
 </script>
+
+<template>
+  <div>
+    <p>four---{{ custon }}</p>
+    <p>attr---{{$attrs}}</p>
+    <el-button @click="fashe">发射</el-button>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {}
+  },
+  props: ['custon'],
+  inheritAttrs: false
+  created() {
+    console.log('2', this.$listeners)
+  },
+  methods: {
+    fashe() {
+      this.$emit('customEvent', 'piupiupiu')
+    }
+  }
+}
+</script>
 ```
 
 
